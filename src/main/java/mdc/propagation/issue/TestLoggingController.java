@@ -23,37 +23,37 @@ import javax.inject.Inject;
 @Validated
 public class TestLoggingController {
 
-	private static final Logger log  = LoggerFactory.getLogger(TestLoggingController.class);
+    private static final Logger log = LoggerFactory.getLogger(TestLoggingController.class);
 
-	private final HttpClient httpClient;
-	private final ApplicationContext applicationContext;
+    private final HttpClient httpClient;
+    private final ApplicationContext applicationContext;
 
-	@Inject
-	public TestLoggingController(HttpClient httpClient, ApplicationContext applicationContext) {
-		this.httpClient = httpClient;
-		this.applicationContext = applicationContext;
-	}
+    @Inject
+    public TestLoggingController(HttpClient httpClient, ApplicationContext applicationContext) {
+        this.httpClient = httpClient;
+        this.applicationContext = applicationContext;
+    }
 
-	@Post("1")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public HttpResponse<?> post1(@Body User user) {
-		log.info("Controller request");
-		var url = applicationContext.getBean(EmbeddedServer.class).getURL();
-		var request = HttpRequest.POST(url + "/test/2", user)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("X-Api-Id", MDC.get("x-api-id"));
-		var result = httpClient.toBlocking().exchange(request, Argument.of(User.class));
-		log.info("Controller response");
-		return HttpResponse.created(result.body()).header("X-Api-Id-From-Controller", MDC.get("x-api-id"));
-	}
+    @Post("1")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public HttpResponse<?> post1(@Body User user) {
+        log.info("Controller request");
+        var url = applicationContext.getBean(EmbeddedServer.class).getURL();
+        var request = HttpRequest.POST(url + "/test/2", user)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Api-Id", MDC.get("x-api-id"));
+        var result = httpClient.toBlocking().exchange(request, Argument.of(User.class));
+        log.info("Controller response");
+        return HttpResponse.created(result.body()).header("X-Api-Id-From-Controller", MDC.get("x-api-id"));
+    }
 
-	@Post("2")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public HttpResponse<?> post2(@Body User user) {
-		return HttpResponse.created(user);
-	}
+    @Post("2")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public HttpResponse<?> post2(@Body User user) {
+        return HttpResponse.created(user);
+    }
 }
 

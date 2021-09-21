@@ -34,13 +34,15 @@ public class MDCHttpServerFilter extends OncePerRequestHttpServerFilter {
 
         return Flowable.fromPublisher(chain.proceed(request))
                 .doOnNext(
-                (response) -> {
-                    if (response != null) {
-                        response.getHeaders().add("X-Api-Id", requestId);
-                    }
-                    log.info("filter response");
-                    MDC.remove("x-api-id");
-                });
+                        (response) -> {
+                            if (response != null) {
+                                response.getHeaders()
+                                        .add("X-Api-Id", requestId)
+                                        .add("X-Api-Id-From-Filter", requestId);
+                            }
+                            log.info("filter response");
+                            MDC.remove("x-api-id");
+                        });
     }
 
     @Override
