@@ -46,7 +46,7 @@ public class TestLoggingController {
 				.header("X-Api-Id", MDC.get("x-api-id"));
 		var result = httpClient.toBlocking().exchange(request, Argument.of(User.class));
 		log.info("Controller response");
-		return HttpResponse.created(result.body());
+		return HttpResponse.created(result.body()).header("X-Api-Id-From-Controller", MDC.get("x-api-id"));
 	}
 
 	@Post("2")

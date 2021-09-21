@@ -25,37 +25,19 @@ class MdcPropagationIssueTest {
     HttpClient client;
 
     @Test
-    void testItWorks() {
-        Assertions.assertTrue(server.isRunning());
-    }
-
-    @Test
-    void testPost() {
-        // given
+    void testPostFails() {
         for (int i = 0; i < 32; i++) {
+            var tempTrackingId = UUID.randomUUID().toString();
             var httpRequest = HttpRequest.POST("/test/1",
                             new User("userId", "firstName", "lastName"))
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header("X-Api-Id", UUID.randomUUID().toString());
-            client.toBlocking().exchange(httpRequest,
+                    .header("X-Api-Id", tempTrackingId);
+            var tempResult = client.toBlocking().exchange(httpRequest,
                     Argument.of(User.class));
+            assert tempTrackingId.equalsIgnoreCase(tempResult.header("X-Api-Id"));
+            assert tempTrackingId.equalsIgnoreCase(tempResult.header("X-Api-Id-From-Controller"));
         }
-
-        var xApiId = UUID.randomUUID().toString();
-        var user = new User("userId", "firstName", "lastName");
-        var httpRequest = HttpRequest.POST("/test/1", user)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Api-Id", xApiId);
-
-        // when
-        var result = client.toBlocking().exchange(httpRequest,
-                Argument.of(User.class));
-
-        // then
-        assert result.status() == HttpStatus.CREATED;
-        assert xApiId.equalsIgnoreCase(result.header("X-Api-Id"));
     }
 
 }
